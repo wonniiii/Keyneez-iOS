@@ -47,7 +47,7 @@ final class IDInfoEditableView: NiblessView, IDIssuedFactory {
     $0.keyneezButtonStyle(style: .whiteAct, title: "다시 촬영")
   }
   
-  private lazy var continueButton: UIButton = .init(primaryAction: actions.continueToIDIssuedViewController(with: self)).then {
+  private lazy var continueButton: UIButton = .init().then {
     $0.keyneezButtonStyle(style: .blackUnact, title: "네, 맞아요")
   }
   
@@ -92,10 +92,8 @@ final class IDInfoEditableView: NiblessView, IDIssuedFactory {
       for text in ocrText {
         if text.allSatisfy { $0.isNumber } {
           idSegmentedValue[1].info = text
-          infoTextField.text = text
         } else {
           idSegmentedValue[1].name = text
-          nameTextField.text = text
         }
       }
     } else {
@@ -104,13 +102,13 @@ final class IDInfoEditableView: NiblessView, IDIssuedFactory {
         if text.contains("학생증") { continue }
         else if text.contains("학교") {
           idSegmentedValue[0].info = text
-          infoTextField.text = text
         } else {
           idSegmentedValue[0].name = text
-          nameTextField.text = text
         }
       }
     }
+    checkTextFields()
+    changeSubtitleLabel()
   }
   
   func makeIDIssuedViewController() -> IDIssuedViewController {
@@ -128,6 +126,7 @@ extension IDInfoEditableView: UITextFieldDelegate {
       self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].info = textField.text ?? ""
     }
     checkTextFields()
+    changeSubtitleLabel()
   }
 }
 
@@ -141,12 +140,21 @@ extension IDInfoEditableView {
   
   private func changeIDTypeUI() -> UIAction {
     return UIAction(handler: { _ in
-      self.infoTextFieldTitle = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].idType.rawValue
-      self.infoPlaceHolder = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].idType.placeholder
-      self.nameTextField.text = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].name
-      self.infoTextField.text = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].info
+      self.changeSubtitleLabel()
+      if self.segmentedControl.selectedSegmentIndex == 0 {
+//        self.continueButton.addAction(self.actions.continueWithStudentID(with: <#T##IDIssuedFactory#>, dto: <#T##UserCheckStudentIDRequestDto#>), for: .touchUpInside)
+      } else {
+//        self.continueButton.addAction(self.actions.continueWithYouthID(with: <#T##IDIssuedFactory#>, dto: <#T##UserCheckYouthIDRequestDto#>), for: .touchUpInside)
+      }
       self.checkTextFields()
     })
+  }
+  
+  private func changeSubtitleLabel() {
+    self.infoTextFieldTitle = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].idType.rawValue
+    self.infoPlaceHolder = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].idType.placeholder
+    self.nameTextField.text = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].name
+    self.infoTextField.text = self.idSegmentedValue[self.segmentedControl.selectedSegmentIndex].info
   }
   
   private func checkTextFields() {
